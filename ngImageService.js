@@ -15,7 +15,7 @@
             }
         }
 
-        var dataUrlToBlob = function (dataUrl) {
+        var dataUrlToBlob = function (dataUrl) {r
             var base64Marker = ";base64,";
             var parts;
             var contentType;
@@ -115,10 +115,11 @@
 
                 if (keepAspectRatio) {
                     // calculate the width and height, constraining the proportions
-                    if (width > height && width > maxWidth) {
+                    if (width > maxWidth) {
                         height = Math.round(height * (maxWidth / width));
                         width = maxWidth;
-                    } else if (height > width && height > maxHeight) {
+                    }
+                    if (height > maxHeight) {
                         width = Math.round(width * (maxHeight / height));
                         height = maxHeight;
                     }
