@@ -2,7 +2,7 @@
     // good coding practices
     "use strict";
 
-    angular.module("ngImageService", []).service("ngImageService", ["$q", function ($q) {
+    angular.module("imageService", []).service("imageService", ["$q", function ($q) {
 
         Element.prototype.remove = function () {
             this.parentElement.removeChild(this);
@@ -93,7 +93,7 @@
         }
 
 
-        var resizeCalculate = function (dataUrl, maxWidth, maxHeight, imageEncoding, smallerThanIsAllowed) {
+        var resizeCalculate = function (dataUrl, maxWidth, maxHeight, imageEncoding, smallerThanIsAllowed, keepAspectRatio) {
             var defer = $q.defer();
             var imageObj = new Image();
 
@@ -113,15 +113,25 @@
                 var height = imageObj.height;
                 var width = imageObj.width;
 
-                // calculate the width and height, constraining the proportions
-                if (width > height && width > maxWidth) {
-                    height = Math.round(height * (maxWidth / width));
-                    width = maxWidth;
+                if (keepAspectRatio) {
+                    // calculate the width and height, constraining the proportions
+                    if (width > height && width > maxWidth) {
+                        height = Math.round(height * (maxWidth / width));
+                        width = maxWidth;
+                    } else if (height > width && height > maxHeight) {
+                        width = Math.round(width * (maxHeight / height));
+                        height = maxHeight;
+                    }
+                } else {
+                    // do not calculate anything, just set the values
+                    if (width > maxWidth) {
+                        width = maxWidth;
+                    }
+                    if (height > maxHeight) {
+                        height = maxHeight;
+                    }
                 }
-                else if (height > width && height > maxHeight) {
-                    width = Math.round(width * (maxHeight / height));
-                    height = maxHeight;
-                }
+                
                 var resizedBlob = resize(imageObj, height, width, imageEncoding);
                 if (!resizedBlob) {
                     defer.reject("Error (ImageService): Image is empty");
@@ -144,7 +154,14 @@
             return defer.promise;
         }
 
-        this.resizeFileTo = function (file, maxHeight, maxWidth, imageEncoding, smallerThanIsAllowed) {
+        this.resizeFileTo = function (file, options) {
+
+            var smallerThanIsAllowed = options.smallerThanIsAllowed || true;
+            var maxWidth = options.maxWidth || 1920;
+            var maxHeight = options.maxHeight || 1080;
+            var imageEncoding = options.imageEncoding || null; // todo write detection for file type if it is not defined 
+            var keepAspectRatio = options.keepAspectRatio || true;
+
             // check for an image       
             if (!file.type.match("image.*")) {
                 console.log("Error (ImageService): File is not an image");
@@ -152,7 +169,7 @@
             };
             return this.getDataUrlFromFile(file).then(
                 function (dataUrl) {
-                    return resizeCalculate(dataUrl, maxWidth, maxHeight, imageEncoding, smallerThanIsAllowed).then(
+                    return resizeCalculate(dataUrl, maxWidth, maxHeight, imageEncoding, smallerThanIsAllowed, keepAspectRatio).then(
                         function (image) {
                             // reset the meta data of the file to the blob
                             if (file.name) {
@@ -169,23 +186,6 @@
                 });
         }
 
-        this.resizeDatabaseFileTo = function (databaseFile, maxWidth, maxHeight, imageEncoding, smallerThanIsAllowed) {
-
-            return resizeCalculate(databaseFile.Content, maxWidth, maxHeight, imageEncoding, smallerThanIsAllowed).then(
-                        function (image) {
-                            // reset the meta data of the file to the blob
-                            if (databaseFile.name) {
-                                image.name = databaseFile.name;
-                            }
-                            if (databaseFile.lastModified) {
-                                image.lastModified = databaseFile.lastModified;
-                            }
-                            if (databaseFile.lastModifiedDate) {
-                                image.lastModifiedDate = databaseFile.lastModifiedDate;
-                            }
-                            return image;
-                        });
-        }
 
     }]);
 
