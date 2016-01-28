@@ -6,4 +6,6 @@ This is just a quick script I wrote based on all kinds of stackoverflow answers 
 If you found a bug, or thought of something interesting to add, use the [Issues tab](https://github.com/ReinisV/ngImageService/issues) or create a [Pull request](https://github.com/ReinisV/ngImageService/pulls).
 
 **TODO:**
+
 create a plnkr to explain it's usage
+make an API interface function which takes in a DataURL as a parameter for resizing.
