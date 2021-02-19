@@ -1,3 +1,10 @@
+### Archivation note [START]
+I wrote the stuff in this repository so long ago, I barely remember doing it.
+
+Since angularjs is dead, I don't plan on adding anything to it.
+
+### Archivation note [END]
+
 # ngImageService
 An angular style image service, which resizes images and returns file dataURLs by exposing an API which returns promises, which then are resolved with whatever has been calculated.
 
